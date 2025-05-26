@@ -1,0 +1,12 @@
+# Node modules
+node_modules/
+.env
+dist/
+.vite/
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
