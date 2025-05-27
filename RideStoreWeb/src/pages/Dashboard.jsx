@@ -1,6 +1,7 @@
 // src/pages/Dashboard.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
+import { formatearPrecio } from "../utils/formatearPrecio"; // ✅ Importar utilidad
 
 export default function Dashboard() {
   const [productos, setProductos] = useState([]);
@@ -13,6 +14,8 @@ export default function Dashboard() {
   const [productoId, setProductoId] = useState(null);
 
   const token = localStorage.getItem("token");
+  const formRef = useRef(null);
+  const contenedorRef = useRef(null);
 
   useEffect(() => {
     obtenerProductos();
@@ -23,9 +26,7 @@ export default function Dashboard() {
       title: "Cargando productos...",
       text: "Por favor espera",
       allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+      didOpen: () => Swal.showLoading(),
     });
 
     try {
@@ -43,7 +44,7 @@ export default function Dashboard() {
       return;
     }
 
-    Swal.close(); // ✅ Cierra el loading cuando finaliza
+    Swal.close();
   };
 
   const convertirABase64 = (file) => {
@@ -74,13 +75,7 @@ export default function Dashboard() {
 
       if (res.ok) {
         obtenerProductos();
-        setNombre("");
-        setDescripcion("");
-        setPrecio("");
-        setImagen("");
-        setCategoria("duke1290r");
-        setModoEdicion(false);
-        setProductoId(null);
+        cancelarEdicion();
 
         Swal.fire({
           icon: "success",
@@ -89,7 +84,6 @@ export default function Dashboard() {
             ? "El producto fue actualizado correctamente"
             : "Tu producto fue añadido exitosamente",
           confirmButtonColor: "#ea580c",
-          confirmButtonText: "Aceptar",
         });
       } else {
         Swal.fire("Error", "No se pudo guardar el producto", "error");
@@ -108,6 +102,29 @@ export default function Dashboard() {
     setCategoria(producto.categoria);
     setProductoId(producto._id);
     setModoEdicion(true);
+
+    setTimeout(() => {
+      const offsetTop = contenedorRef.current?.getBoundingClientRect().top + window.scrollY;
+      const offset = offsetTop - 20;
+      window.scrollTo({ top: offset, behavior: "smooth" });
+    }, 100);
+  };
+
+  const cancelarEdicion = () => {
+    setNombre("");
+    setDescripcion("");
+    setPrecio("");
+    setImagen("");
+    setCategoria("duke1290r");
+    setProductoId(null);
+    setModoEdicion(false);
+
+    Swal.fire({
+      icon: "info",
+      title: "Edición cancelada",
+      text: "Los cambios no fueron guardados",
+      confirmButtonColor: "#d33",
+    });
   };
 
   const eliminarProducto = async (id) => {
@@ -145,10 +162,18 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div ref={contenedorRef} className="max-w-5xl mx-auto px-4 pt-32 pb-8">
       <h2 className="text-2xl font-bold mb-6">Gestionar Productos</h2>
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md mb-10">
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        className={`bg-white p-6 rounded shadow-md mb-10 border-2 transition-all duration-300 ${
+          modoEdicion
+            ? "border-orange-500 ring-2 ring-orange-300 animate-pulse"
+            : "border-transparent"
+        }`}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             type="text"
@@ -189,12 +214,25 @@ export default function Dashboard() {
             className="col-span-1 md:col-span-2"
           />
         </div>
-        <button
-          type="submit"
-          className="mt-4 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition"
-        >
-          {modoEdicion ? "Actualizar Producto" : "Crear Producto"}
-        </button>
+
+        <div className="flex gap-4 mt-4">
+          <button
+            type="submit"
+            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition"
+          >
+            {modoEdicion ? "Actualizar Producto" : "Crear Producto"}
+          </button>
+
+          {modoEdicion && (
+            <button
+              type="button"
+              onClick={cancelarEdicion}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+            >
+              Cancelar edición
+            </button>
+          )}
+        </div>
       </form>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -209,9 +247,13 @@ export default function Dashboard() {
             )}
             <h3 className="font-semibold text-lg">{p.nombre}</h3>
             <p className="text-sm text-gray-600">{p.descripcion}</p>
-            <p className="text-orange-600 font-bold mt-1">${p.precio}</p>
+            <p className="text-orange-600 font-bold mt-1">
+              ${formatearPrecio(Number(p.precio))}
+            </p>
             <p className="text-xs text-gray-400">Categoría: {p.categoria}</p>
-            <p className="text-xs text-gray-400 mt-1">Creado por: {p.usuarioId?.nombre}</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Creado por: {p.usuarioId?.nombre}
+            </p>
             <div className="flex gap-2 mt-3">
               <button
                 onClick={() => editarProducto(p)}
