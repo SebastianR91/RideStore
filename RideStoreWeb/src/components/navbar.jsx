@@ -115,8 +115,17 @@ export default function Navbar({ onToggleSidebar }) {
         {/* Panel desplegable de usuario */}
         {mostrarPanel && usuario && (
           <div className="absolute right-0 top-14 bg-white text-black rounded shadow-lg w-60 p-4 z-50">
-            <p className="font-semibold text-orange-500">👤 {usuario.nombre}</p>
-            <p className="text-sm text-gray-700 mb-3">{usuario.correo}</p>
+            <p className="font-semibold text-orange-500">👤 {usuario.nombre} {usuario.apellidos}</p>
+            <p className="text-sm text-gray-700">📧 {usuario.correo}</p>
+            {usuario.telefono && (
+              <p className="text-sm text-gray-700">📱 {usuario.telefono}</p>
+            )}
+            {usuario.ciudad && (
+              <p className="text-sm text-gray-700">📍 {usuario.ciudad}</p>
+            )}
+            <p className="text-sm text-gray-700 mb-3">
+              🔐 Rol: <span className="font-bold text-orange-600 uppercase">{usuario.rol}</span>
+            </p>
             <button
               onClick={cerrarSesion}
               className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition"

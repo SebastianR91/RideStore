@@ -1,49 +1,64 @@
-const Usuario = require("../models/UserModel"); // Importa el modelo de usuario definido con Mongoose para interactuar con la colección "usuarios" en la base de datos.
+const Usuario = require("../models/UserModel"); // Modelo de Usuario
 const bcrypt = require("bcryptjs"); // Encriptación de contraseñas
-const jwt = require("jsonwebtoken"); // Generación de tokens JWT
+const jwt = require("jsonwebtoken"); // Generación de tokens
 
 //--------------------------
 // Registrar nuevo usuario
 //--------------------------
 const registrarUsuario = async (req, res) => {
-  const { nombre, correo, contrasena } = req.body;
+  const {
+    nombre,
+    apellidos,
+    fechaNacimiento,
+    telefono,
+    ciudad,
+    correo,
+    contrasena,
+  } = req.body;
 
   try {
-    // Verificar si el correo ya existe
     const usuarioExistente = await Usuario.findOne({ correo });
     if (usuarioExistente) {
       return res.status(400).json({ mensaje: "Este correo ya está registrado." });
     }
 
-    // Encriptar la contraseña
+    const totalUsuarios = await Usuario.countDocuments();
+    const rolAsignado = totalUsuarios < 2 ? "admin" : "cliente";
+
     const salt = await bcrypt.genSalt(10);
     const contrasenaHash = await bcrypt.hash(contrasena, salt);
 
-    // Crear y guardar nuevo usuario
     const nuevoUsuario = new Usuario({
       nombre,
+      apellidos,
+      fechaNacimiento,
+      telefono,
+      ciudad,
       correo,
       contrasena: contrasenaHash,
+      rol: rolAsignado,
     });
 
     await nuevoUsuario.save();
 
-    // Generar token JWT
     const token = jwt.sign(
-      { id: nuevoUsuario._id },
+      { id: nuevoUsuario._id, rol: nuevoUsuario.rol },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
-    // Respuesta exitosa
     res.status(201).json({
       mensaje: "Usuario registrado con éxito.",
       token,
       usuario: {
         id: nuevoUsuario._id,
         nombre: nuevoUsuario.nombre,
-        correo: nuevoUsuario.correo
-      }
+        apellidos: nuevoUsuario.apellidos,
+        correo: nuevoUsuario.correo,
+        telefono: nuevoUsuario.telefono,
+        ciudad: nuevoUsuario.ciudad,
+        rol: nuevoUsuario.rol,
+      },
     });
 
   } catch (error) {
@@ -59,34 +74,34 @@ const loginUsuario = async (req, res) => {
   const { correo, contrasena } = req.body;
 
   try {
-    // Verificar si el usuario existe
     const usuario = await Usuario.findOne({ correo });
     if (!usuario) {
       return res.status(400).json({ mensaje: "Correo no registrado." });
     }
 
-    // Verificar la contraseña
     const contrasenaValida = await bcrypt.compare(contrasena, usuario.contrasena);
     if (!contrasenaValida) {
       return res.status(400).json({ mensaje: "Contraseña incorrecta." });
     }
 
-    // Generar nuevo token
     const token = jwt.sign(
-      { id: usuario._id },
+      { id: usuario._id, rol: usuario.rol },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
-    // Respuesta exitosa
     res.status(200).json({
       mensaje: "Inicio de sesión exitoso.",
       token,
       usuario: {
         id: usuario._id,
         nombre: usuario.nombre,
-        correo: usuario.correo
-      }
+        apellidos: usuario.apellidos,
+        correo: usuario.correo,
+        telefono: usuario.telefono,
+        ciudad: usuario.ciudad,
+        rol: usuario.rol,
+      },
     });
 
   } catch (error) {

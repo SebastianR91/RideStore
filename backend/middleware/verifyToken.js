@@ -1,4 +1,4 @@
-// middleware/verifyToken.js
+// 📁 middleware/verifyToken.js
 
 const jwt = require("jsonwebtoken"); // Importa JWT para verificar el token
 
@@ -13,7 +13,12 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verifica el token con la clave secreta
-    req.usuario = { id: decoded.id }; // Guarda el ID del usuario en el request
+
+    req.usuario = {
+      id: decoded.id,
+      rol: decoded.rol, // ✅ Incluye el rol del usuario para control posterior
+    };
+
     next(); // Continúa a la siguiente función o controlador
   } catch (error) {
     return res.status(401).json({ mensaje: "Token inválido o expirado." });

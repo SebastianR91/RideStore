@@ -6,6 +6,10 @@ import { useNavigate } from "react-router-dom";
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [nombre, setNombre] = useState("");
+  const [apellidos, setApellidos] = useState("");
+  const [fechaNacimiento, setFechaNacimiento] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [ciudad, setCiudad] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const navigate = useNavigate();
@@ -13,11 +17,11 @@ export default function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!correo || !contrasena || (!isLogin && !nombre)) {
+    if (!correo || !contrasena || (!isLogin && (!nombre || !apellidos || !fechaNacimiento))) {
       return Swal.fire({
         icon: "warning",
         title: "Campos vacíos",
-        text: "Completa todos los campos",
+        text: "Completa todos los campos obligatorios",
         confirmButtonColor: "#ea580c",
       });
     }
@@ -44,48 +48,26 @@ export default function Auth() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
-        /*await Swal.fire({
-          icon: "success",
-          title: "¡Bienvenido!",
-          text: "Inicio de sesión exitoso",
-          confirmButtonColor: "#ea580c",
-        });
-
         Swal.fire({
-          title: "Cargando productos...",
-          html: "Redirigiendo al inicio",
+          title: "Iniciando sesión...",
+          html: "Redirigiendo al inicio...",
           allowOutsideClick: false,
+          showConfirmButton: false,
           didOpen: () => {
             Swal.showLoading();
           },
-          timer: 500,
-          timerProgressBar: true,
-        }).then(() => {
-          navigate("/");
         });
 
-        navigate("/");*/             //Asi me gusta mas
-
-        Swal.fire({
-        title: "Iniciando sesión...",
-        html: "Redirigiendo al inicio...",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      setTimeout(() => {
-        Swal.close(); // <- Cierra el modal
-        navigate("/"); // <- Redirige al Home
-      }, 1000);
+        setTimeout(() => {
+          Swal.close();
+          navigate("/");
+        }, 1000);
 
       } else {
         const res = await fetch("http://localhost:5000/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nombre, correo, contrasena }),
+          body: JSON.stringify({ nombre, apellidos, fechaNacimiento, telefono, ciudad, correo, contrasena }),
         });
 
         const data = await res.json();
@@ -111,6 +93,10 @@ export default function Auth() {
 
         setIsLogin(true);
         setNombre("");
+        setApellidos("");
+        setFechaNacimiento("");
+        setTelefono("");
+        setCiudad("");
         setCorreo("");
         setContrasena("");
       }
@@ -125,10 +111,25 @@ export default function Auth() {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="relative w-[90%] max-w-4xl h-[500px] rounded-xl shadow-2xl overflow-hidden bg-white">
+  // 🔙 Botón volver
+  const handleVolver = () => {
+    if (window.history.length > 2) {
+      window.history.back();
+    } else {
+      navigate("/");
+    }
+  };
 
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        backgroundImage: "url('/images/ktm-track.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="relative w-[90%] max-w-4xl h-[600px] rounded-xl shadow-2xl overflow-hidden bg-white bg-opacity-95">
         {/* PANEL LATERAL NARANJA */}
         <div
           className={`
@@ -147,7 +148,7 @@ export default function Auth() {
           </p>
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="px-6 py-2 border border-white hover:bg-white hover:text-orange-600 rounded transition"
+            className="px-6 py-2 border border-white rounded transition hover:bg-white hover:text-black"
           >
             {isLogin ? "Registrarse" : "Iniciar sesión"}
           </button>
@@ -167,43 +168,35 @@ export default function Auth() {
             </h2>
 
             {!isLogin && (
-              <input
-                type="text"
-                placeholder="Nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
+              <>
+                <input type="text" placeholder="Nombres" value={nombre} onChange={(e) => setNombre(e.target.value)} className="w-full p-2 border border-gray-300 rounded" />
+                <input type="text" placeholder="Apellidos" value={apellidos} onChange={(e) => setApellidos(e.target.value)} className="w-full p-2 border border-gray-300 rounded" />
+                <input type="date" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} className="w-full p-2 border border-gray-300 rounded" />
+                <input type="text" placeholder="Teléfono" value={telefono} onChange={(e) => setTelefono(e.target.value)} className="w-full p-2 border border-gray-300 rounded" />
+                <input type="text" placeholder="Ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} className="w-full p-2 border border-gray-300 rounded" />
+              </>
             )}
 
-            <input
-              type="email"
-              placeholder="Correo electrónico"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
+            <input type="email" placeholder="Correo electrónico" value={correo} onChange={(e) => setCorreo(e.target.value)} className="w-full p-2 border border-gray-300 rounded" />
+            <input type="password" placeholder="Contraseña" value={contrasena} onChange={(e) => setContrasena(e.target.value)} className="w-full p-2 border border-gray-300 rounded" />
 
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={contrasena}
-              onChange={(e) => setContrasena(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-
-            <button
-              type="submit"
-              className="bg-orange-600 hover:bg-orange-700 text-white w-full py-2 rounded transition"
-            >
+            <button type="submit" className="bg-orange-600 hover:bg-black hover:text-white text-white w-full py-2 rounded transition">
               {isLogin ? "Entrar" : "Crear cuenta"}
             </button>
           </form>
 
+          {/* 🔙 BOTÓN VOLVER */}
+          <button
+            onClick={handleVolver}
+            className="mt-6 text-sm text-gray-600 underline hover:text-black"
+          >
+            ← Volver atrás
+          </button>
+
           {/* Alternancia en móviles */}
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="mt-4 text-sm text-orange-600 underline md:hidden"
+            className="mt-2 text-sm text-orange-600 underline md:hidden"
           >
             {isLogin
               ? "¿No tienes cuenta? Regístrate aquí"
