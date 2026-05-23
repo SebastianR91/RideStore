@@ -342,10 +342,10 @@ export default function Modelos() {
 
                   <div className="flex flex-wrap justify-center items-center gap-2">
                     <button
-                      onClick={() => navigate(`/catalogo-categorias?modeloId=${modelo._id}`)}
+                      onClick={() => navigate(`/productos?modeloId=${modelo._id}`)}
                       className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transform hover:scale-105 transition-transform duration-300"
                     >
-                      Ver categorías
+                      Ver productos
                     </button>
 
                     {esAdmin && (

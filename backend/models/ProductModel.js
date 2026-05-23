@@ -25,6 +25,11 @@ const productoSchema = new mongoose.Schema({
     ref: "ProductCategory",
     required: true
   },
+  modeloId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MotorcycleModel",
+    required: false
+  },
   stock: {
     type: Number,
     default: 0,

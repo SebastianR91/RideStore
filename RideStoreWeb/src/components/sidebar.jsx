@@ -39,7 +39,7 @@ export default function Sidebar({ isOpen, onClose }) {
         </li>
         <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
           <img src="https://api.iconify.design/tabler:package.svg" alt="Productos" className="w-5 h-5" />
-          <Link to="/dashboard" className="w-full">Dashboard</Link>
+          <Link to="/productos" className="w-full">Productos</Link>
         </li>
         <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
           <Icon icon="tabler:volume" className="w-5 h-5" />

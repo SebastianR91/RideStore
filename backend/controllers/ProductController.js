@@ -3,7 +3,7 @@ const Producto = require("../models/ProductModel"); // Modelo de producto
 // Crear un nuevo producto
 const crearProducto = async (req, res) => {
   try {
-    const { nombre, descripcion, imagen, precio, categoriaId, stock, sku } = req.body;
+    const { nombre, descripcion, imagen, precio, categoriaId, modeloId, stock, sku } = req.body;
 
     // Verifica que el usuario esté autenticado (se obtiene desde el middleware del token)
     const usuarioId = req.usuario.id;
@@ -15,8 +15,9 @@ const crearProducto = async (req, res) => {
       imagen,
       precio,
       categoriaId,
+      modeloId,
       stock,
-      sku,
+      sku: sku || undefined,
       usuarioId
     });
 
@@ -40,13 +41,17 @@ const obtenerProductos = async (req, res) => {
     if (req.query.categoriaId) {
       filtro.categoriaId = req.query.categoriaId;
     }
+    if (req.query.modeloId) {
+      filtro.modeloId = req.query.modeloId;
+    }
     if (req.query.activo) {
       filtro.activo = req.query.activo === "true";
     }
 
     const productos = await Producto.find(filtro)
       .populate("usuarioId", "nombre correo")
-      .populate("categoriaId", "nombre slug");
+      .populate("categoriaId", "nombre slug")
+      .populate("modeloId", "nombre slug cilindraje anioInicio anioFin imagen brandId");
     res.status(200).json(productos);
   } catch (error) {
     console.error("Error al obtener productos:", error);
@@ -68,15 +73,16 @@ const eliminarProducto = async (req, res) => {
 // Actualizar un producto por ID
 const actualizarProducto = async (req, res) => {
   try {
-    const { nombre, descripcion, imagen, precio, categoriaId, stock, sku } = req.body;
+    const { nombre, descripcion, imagen, precio, categoriaId, modeloId, stock, sku } = req.body;
 
     const productoActualizado = await Producto.findByIdAndUpdate(
       req.params.id,
-      { nombre, descripcion, imagen, precio, categoriaId, stock, sku },
+      { nombre, descripcion, imagen, precio, categoriaId, modeloId, stock, sku: sku || undefined },
       { new: true }
     )
       .populate("usuarioId", "nombre correo")
-      .populate("categoriaId", "nombre slug");
+      .populate("categoriaId", "nombre slug")
+      .populate("modeloId", "nombre slug cilindraje anioInicio anioFin imagen brandId");
 
     res.status(200).json({
       mensaje: "Producto actualizado exitosamente.",

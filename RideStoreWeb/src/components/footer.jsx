@@ -22,7 +22,7 @@ export default function Footer() {
             <div>
             <h3 className="text-orange-500 font-bold mb-2">Sobre RideStore</h3>
             <p className="text-gray-300">
-                Somos tu aliado en motopartes KTM, ofreciendo repuestos de calidad para que tu moto siempre rinda al máximo.
+                Somos tu aliado en motopartes, ofreciendo repuestos de calidad para que tu moto siempre rinda al máximo.
             </p>
             </div>
 
