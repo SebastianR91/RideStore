@@ -15,6 +15,18 @@ app.use("/api/auth", authRoutes); // Monta esas rutas bajo el prefijo /api/auth
 const productRoutes = require("./routes/ProductRoute");
 app.use("/api/productos", productRoutes);
 
+const brandRoutes = require("./routes/BrandRoute");
+app.use("/api/marcas", brandRoutes);
+
+const motorcycleTypeRoutes = require("./routes/MotorcycleTypeRoute");
+app.use("/api/tipos-moto", motorcycleTypeRoutes);
+
+const motorcycleModelRoutes = require("./routes/MotorcycleModelRoute");
+app.use("/api/modelos-moto", motorcycleModelRoutes);
+
+const productCategoryRoutes = require("./routes/ProductCategoryRoute");
+app.use("/api/categorias-producto", productCategoryRoutes);
+
 // Conectar base de datos
 mongoose.connect(process.env.MONGO_URI) // Usa la URI almacenada en .env para conectar a MongoDB Atlas
   .then(() => console.log("✅ Conectado a MongoDB")) // Mensaje si la conexión fue exitosa

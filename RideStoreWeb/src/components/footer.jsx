@@ -1,7 +1,20 @@
 // src/components/Footer.jsx
 import { Icon } from "@iconify/react";
+import { Link } from "react-router-dom";
+
+const enlacesRapidos = [
+  { label: "Inicio", to: "/" },
+  { label: "Categorías", to: "/categorias" },
+  { label: "Nosotros", to: "/nosotros" },
+  { label: "Contacto", href: "mailto:contacto@ridestore.com" },
+  { label: "Términos y Condiciones", href: "#" },
+  { label: "Política de Privacidad", href: "#" },
+];
 
 export default function Footer() {
+  const linkClass =
+    "hover:text-orange-500 transition-transform duration-300 hover:scale-105 inline-block";
+
   return (
     <footer className="bg-black text-white px-6 pt-10 pb-4 mt-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-sm max-w-6xl mx-auto text-center md:text-left">
@@ -17,15 +30,18 @@ export default function Footer() {
             <div>
             <h3 className="text-orange-500 font-bold mb-2">Enlaces Rápidos</h3>
             <ul className="space-y-1">
-                {["Inicio", "Categorías", "Nosotros", "Contacto", "Términos y Condiciones", "Política de Privacidad"].map((item, index) => (
-                <li key={index}>
-                    <a
-                    href="#"
-                    className="hover:text-orange-500 transition-transform duration-300 hover:scale-105 inline-block"
-                    >
-                    {item}
-                    </a>
-                </li>
+                {enlacesRapidos.map((item) => (
+                  <li key={item.label}>
+                    {"to" in item ? (
+                      <Link to={item.to} className={linkClass}>
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <a href={item.href} className={linkClass}>
+                        {item.label}
+                      </a>
+                    )}
+                  </li>
                 ))}
             </ul>
             </div>

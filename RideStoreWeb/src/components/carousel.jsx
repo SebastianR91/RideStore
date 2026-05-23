@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const images = [
   "/images/Duke1290R.png",
-  "/images/RideStore Logo.jpg",
+  "/images/RideStore Logo.png",
   "/images/Duke 390.jpg",
 ];
 
