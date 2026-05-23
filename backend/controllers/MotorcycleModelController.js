@@ -3,13 +3,14 @@ const MotorcycleModel = require("../models/MotorcycleModel");
 // Crear un nuevo modelo de motocicleta
 const crear = async (req, res) => {
   try {
-    const { nombre, slug, brandId, typeId, cilindraje, anioInicio, anioFin, activo } = req.body;
+    const { nombre, slug, brandId, typeId, imagen, cilindraje, anioInicio, anioFin, activo } = req.body;
 
     const nuevoModelo = new MotorcycleModel({
       nombre,
       slug,
       brandId,
       typeId,
+      imagen,
       cilindraje,
       anioInicio,
       anioFin,
@@ -59,11 +60,11 @@ const obtenerPorId = async (req, res) => {
 // Actualizar un modelo de motocicleta por ID
 const actualizar = async (req, res) => {
   try {
-    const { nombre, slug, brandId, typeId, cilindraje, anioInicio, anioFin, activo } = req.body;
+    const { nombre, slug, brandId, typeId, imagen, cilindraje, anioInicio, anioFin, activo } = req.body;
 
     const modeloActualizado = await MotorcycleModel.findByIdAndUpdate(
       req.params.id,
-      { nombre, slug, brandId, typeId, cilindraje, anioInicio, anioFin, activo },
+      { nombre, slug, brandId, typeId, imagen, cilindraje, anioInicio, anioFin, activo },
       { new: true }
     )
       .populate("brandId", "nombre slug logo")

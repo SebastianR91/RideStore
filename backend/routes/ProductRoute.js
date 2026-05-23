@@ -16,6 +16,4 @@ router.get("/", obtenerProductos); // GET /api/products
 router.delete("/:id", verifyToken, eliminarProducto); // DELETE /api/productos/:id
 router.put("/:id", verifyToken, actualizarProducto);
 
-router.put("/:id", verifyToken, actualizarProducto);
-
 module.exports = router;

@@ -5,7 +5,8 @@
  "scripts": {
   "test": "nodemon Server.js",
   "start": "node Server.js",
-  "dev": "nodemon Server.js"
+  "dev": "nodemon Server.js",
+  "seed:types": "node seedMotorcycleTypes.js"
   },
   "keywords": [],
   "author": "",

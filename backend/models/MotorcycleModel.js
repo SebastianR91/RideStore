@@ -23,6 +23,10 @@ const motorcycleModelSchema = new mongoose.Schema({
     ref: "MotorcycleType",
     required: true
   },
+  imagen: {
+    type: String,
+    required: false
+  },
   cilindraje: {
     type: Number,
     required: false

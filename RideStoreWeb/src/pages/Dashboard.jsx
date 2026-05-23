@@ -5,11 +5,14 @@ import { formatearPrecio } from "../utils/formatearPrecio"; // ✅ Importar util
 
 export default function Dashboard() {
   const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("");
   const [imagen, setImagen] = useState("");
-  const [categoria, setCategoria] = useState("duke1290r");
+  const [categoriaId, setCategoriaId] = useState("");
+  const [stock, setStock] = useState("");
+  const [sku, setSku] = useState("");
   const [modoEdicion, setModoEdicion] = useState(false);
   const [productoId, setProductoId] = useState(null);
 
@@ -19,7 +22,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     obtenerProductos();
+    obtenerCategorias();
   }, []);
+
+  const obtenerCategorias = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/categorias-producto");
+      const data = await res.json();
+      setCategorias(data);
+    } catch (error) {
+      console.error("Error al obtener categorias:", error);
+    }
+  };
 
   const obtenerProductos = async () => {
     Swal.fire({
@@ -70,7 +84,7 @@ export default function Dashboard() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ nombre, descripcion, precio, imagen, categoria }),
+        body: JSON.stringify({ nombre, descripcion, precio, imagen, categoriaId, stock, sku }),
       });
 
       if (res.ok) {
@@ -99,7 +113,9 @@ export default function Dashboard() {
     setDescripcion(producto.descripcion);
     setPrecio(producto.precio);
     setImagen(producto.imagen);
-    setCategoria(producto.categoria);
+    setCategoriaId(producto.categoriaId?._id || producto.categoriaId || "");
+    setStock(producto.stock ?? "");
+    setSku(producto.sku || "");
     setProductoId(producto._id);
     setModoEdicion(true);
 
@@ -115,7 +131,9 @@ export default function Dashboard() {
     setDescripcion("");
     setPrecio("");
     setImagen("");
-    setCategoria("duke1290r");
+    setCategoriaId("");
+    setStock("");
+    setSku("");
     setProductoId(null);
     setModoEdicion(false);
 
@@ -193,19 +211,35 @@ export default function Dashboard() {
           />
           <input
             type="text"
+            placeholder="SKU"
+            value={sku}
+            onChange={(e) => setSku(e.target.value)}
+            className="p-2 border rounded"
+          />
+          <input
+            type="number"
+            placeholder="Stock"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
+            className="p-2 border rounded"
+          />
+          <input
+            type="text"
             placeholder="Descripción"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             className="p-2 border rounded col-span-1 md:col-span-2"
           />
           <select
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
+            value={categoriaId}
+            onChange={(e) => setCategoriaId(e.target.value)}
             className="p-2 border rounded col-span-1 md:col-span-2"
+            required
           >
-            <option value="duke1290r">Duke 1290R</option>
-            <option value="duke390">Duke 390</option>
-            <option value="accesorios">Accesorios y Equipamiento</option>
+            <option value="">Selecciona una categoría</option>
+            {categorias.map((cat) => (
+              <option key={cat._id} value={cat._id}>{cat.nombre}</option>
+            ))}
           </select>
           <input
             type="file"
@@ -250,7 +284,9 @@ export default function Dashboard() {
             <p className="text-orange-600 font-bold mt-1">
               ${formatearPrecio(Number(p.precio))}
             </p>
-            <p className="text-xs text-gray-400">Categoría: {p.categoria}</p>
+            <p className="text-xs text-gray-400">Categoría: {p.categoriaId?.nombre}</p>
+            <p className="text-xs text-gray-400">SKU: {p.sku}</p>
+            <p className="text-xs text-gray-400">Stock: {p.stock}</p>
             <p className="text-xs text-gray-400 mt-1">
               Creado por: {p.usuarioId?.nombre}
             </p>

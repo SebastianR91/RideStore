@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const enlacesRapidos = [
   { label: "Inicio", to: "/" },
-  { label: "Categorías", to: "/categorias" },
+  { label: "Marcas", to: "/categorias" },
   { label: "Nosotros", to: "/nosotros" },
   { label: "Contacto", href: "mailto:contacto@ridestore.com" },
   { label: "Términos y Condiciones", href: "#" },

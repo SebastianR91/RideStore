@@ -20,10 +20,25 @@ const productoSchema = new mongoose.Schema({
     required: true,           // También es obligatorio
     min: 0                    // No puede ser negativo
   },
-  categoria: {
+  categoriaId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ProductCategory",
+    required: true
+  },
+  stock: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  sku: {
     type: String,
-    required: true,
-    enum: ["duke1290r", "duke390", "accesorios"] // ← para controlar errores
+    trim: true,
+    unique: true,
+    sparse: true
+  },
+  activo: {
+    type: Boolean,
+    default: true
   },
   usuarioId: {
     type: mongoose.Schema.Types.ObjectId, // Referencia al ID del usuario que creó el producto

@@ -73,7 +73,7 @@ export default function Navbar({ onToggleSidebar }) {
           to="/categorias"
           className="text-white text-lg hover:scale-110 hover:text-orange-500 transition-transform duration-300"
         >
-          Categorías
+          Marcas
         </Link>
         <Link
           to="/nosotros"
