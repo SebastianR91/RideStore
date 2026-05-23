@@ -15,8 +15,10 @@ export default function Carrito() {
     localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
   };
 
+  const obtenerItemId = (item) => item.productoId || item._id;
+
   const eliminarDelCarrito = (id) => {
-    const nuevoCarrito = carrito.filter((item) => item._id !== id);
+    const nuevoCarrito = carrito.filter((item) => obtenerItemId(item) !== id);
     actualizarCarrito(nuevoCarrito);
     Swal.fire({
       icon: "info",
@@ -26,15 +28,23 @@ export default function Carrito() {
   };
 
   const aumentarCantidad = (id) => {
-    const nuevoCarrito = carrito.map((item) =>
-      item._id === id ? { ...item, cantidad: item.cantidad + 1 } : item
-    );
+    const nuevoCarrito = carrito.map((item) => {
+      if (obtenerItemId(item) === id) {
+        const stockDisponible = Number(item.stock) || 0;
+        if (stockDisponible && item.cantidad >= stockDisponible) {
+          Swal.fire("Stock insuficiente", "No puedes agregar más unidades que el stock disponible", "warning");
+          return item;
+        }
+        return { ...item, cantidad: item.cantidad + 1 };
+      }
+      return item;
+    });
     actualizarCarrito(nuevoCarrito);
   };
 
   const disminuirCantidad = (id) => {
     const nuevoCarrito = carrito.map((item) => {
-      if (item._id === id && item.cantidad > 1) {
+      if (obtenerItemId(item) === id && item.cantidad > 1) {
         return { ...item, cantidad: item.cantidad - 1 };
       }
       return item;
@@ -57,7 +67,7 @@ export default function Carrito() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {carrito.map((item) => (
               <div
-                key={item._id}
+                key={obtenerItemId(item)}
                 className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-lg hover:shadow-orange-400 transform hover:scale-105 transition-transform duration-300"
               >
                 {item.imagen && (
@@ -73,14 +83,14 @@ export default function Carrito() {
 
                   <div className="flex items-center gap-2 mt-2">
                     <button
-                      onClick={() => disminuirCantidad(item._id)}
+                      onClick={() => disminuirCantidad(obtenerItemId(item))}
                       className="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
                     >
                       -
                     </button>
                     <span className="font-medium">{item.cantidad}</span>
                     <button
-                      onClick={() => aumentarCantidad(item._id)}
+                      onClick={() => aumentarCantidad(obtenerItemId(item))}
                       className="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
                     >
                       +
@@ -93,7 +103,7 @@ export default function Carrito() {
                 </div>
 
                 <button
-                  onClick={() => eliminarDelCarrito(item._id)}
+                  onClick={() => eliminarDelCarrito(obtenerItemId(item))}
                   className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transform hover:scale-105 transition-transform duration-300"
                 >
                   Eliminar

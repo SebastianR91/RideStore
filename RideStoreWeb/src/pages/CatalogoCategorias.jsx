@@ -7,7 +7,8 @@ export default function CatalogoCategorias() {
   const params = new URLSearchParams(window.location.search);
   const modeloId = params.get("modeloId");
   const token = localStorage.getItem("token");
-  const esAdmin = Boolean(token);
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const esAdmin = usuario?.rol?.toLowerCase() === "admin";
 
   const [modelo, setModelo] = useState(null);
   const [categorias, setCategorias] = useState([]);

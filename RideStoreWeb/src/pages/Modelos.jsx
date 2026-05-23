@@ -7,7 +7,8 @@ export default function Modelos() {
   const params = new URLSearchParams(window.location.search);
   const marcaId = params.get("marcaId");
   const token = localStorage.getItem("token");
-  const esAdmin = Boolean(token);
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const esAdmin = usuario?.rol?.toLowerCase() === "admin";
 
   const [modelos, setModelos] = useState([]);
   const [tiposMoto, setTiposMoto] = useState([]);

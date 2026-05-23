@@ -5,7 +5,18 @@ import menuIcon from "../assets/icons/menu_h.svg";
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+  const esCliente = usuario?.rol?.toLowerCase() === "cliente";
+
+  const itemClass =
+    "flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105";
+
+  const cerrarSesion = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
+    navigate("/");
+    window.location.reload();
+  };
 
   return (
     <aside
@@ -14,7 +25,6 @@ export default function Sidebar({ isOpen, onClose }) {
       ${isOpen ? "translate-x-0" : "-translate-x-full"}
       bg-gray-100 shadow-2xl border-r border-orange-200`}
     >
-      {/* Encabezado */}
       <div className="bg-black h-16 flex items-center justify-center relative">
         <button
           onClick={onClose}
@@ -31,54 +41,83 @@ export default function Sidebar({ isOpen, onClose }) {
         </span>
       </div>
 
-      {/* Menú lateral */}
       <ul className="p-4 text-black mt-4 space-y-2">
-        <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
-          <Icon icon="tabler:home" className="w-5 h-5" />
-          <Link to="/" className="w-full">Inicio</Link>
-        </li>
-        <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
-          <img src="https://api.iconify.design/tabler:package.svg" alt="Productos" className="w-5 h-5" />
-          <Link to="/productos" className="w-full">Productos</Link>
-        </li>
-        <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
-          <Icon icon="tabler:volume" className="w-5 h-5" />
-          Marketing
-        </li>
-        <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
-          <Icon icon="tabler:currency-dollar" className="w-5 h-5" />
-          Ventas
-        </li>
-        <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
-          <Icon icon="tabler:wallet" className="w-5 h-5" />
-          Cartera
-        </li>
-        <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
-          <Icon icon="tabler:chart-bar" className="w-5 h-5" />
-          Informes
-        </li>
-        <li className="flex items-center gap-2 p-3 rounded hover:bg-orange-500 hover:text-white cursor-pointer transition-transform hover:scale-105">
-          <Icon icon="tabler:tools" className="w-5 h-5" />
-          Herramientas
-        </li>
-
-        {/* Botones de login/registro si NO hay usuario */}
-        {!usuario && (
+        {esCliente ? (
           <>
-            <li
-              onClick={() => navigate("/auth?modo=login")}
-              className="flex items-center gap-2 p-3 mt-4 bg-orange-500 text-white rounded hover:bg-black cursor-pointer transition-transform hover:scale-105"
-            >
-              <Icon icon="tabler:login" className="w-5 h-5" />
-              Iniciar Sesión
+            <li className={itemClass}>
+              <Icon icon="tabler:home" className="w-5 h-5" />
+              <Link to="/" className="w-full">Inicio</Link>
             </li>
-            <li
-              onClick={() => navigate("/auth?modo=registro")}
-              className="flex items-center gap-2 p-3 mt-2 bg-orange-500 text-white rounded hover:bg-black cursor-pointer transition-transform hover:scale-105"
-            >
-              <Icon icon="tabler:user-plus" className="w-5 h-5" />
-              Registrarse
+            <li className={itemClass}>
+              <Icon icon="tabler:package" className="w-5 h-5" />
+              <Link to="/productos" className="w-full">Productos</Link>
             </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:shopping-cart" className="w-5 h-5" />
+              <Link to="/carrito" className="w-full">Mi carrito</Link>
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:clipboard-list" className="w-5 h-5" />
+              <span className="w-full">Mis pedidos</span>
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:user" className="w-5 h-5" />
+              <span className="w-full">Mi perfil</span>
+            </li>
+            <li onClick={cerrarSesion} className={itemClass}>
+              <Icon icon="tabler:logout" className="w-5 h-5" />
+              Cerrar sesión
+            </li>
+          </>
+        ) : (
+          <>
+            <li className={itemClass}>
+              <Icon icon="tabler:home" className="w-5 h-5" />
+              <Link to="/" className="w-full">Inicio</Link>
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:package" className="w-5 h-5" />
+              <Link to="/productos" className="w-full">Productos</Link>
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:volume" className="w-5 h-5" />
+              Marketing
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:currency-dollar" className="w-5 h-5" />
+              Ventas
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:wallet" className="w-5 h-5" />
+              Cartera
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:chart-bar" className="w-5 h-5" />
+              Informes
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:tools" className="w-5 h-5" />
+              Herramientas
+            </li>
+
+            {!usuario && (
+              <>
+                <li
+                  onClick={() => navigate("/auth?modo=login")}
+                  className="flex items-center gap-2 p-3 mt-4 bg-orange-500 text-white rounded hover:bg-black cursor-pointer transition-transform hover:scale-105"
+                >
+                  <Icon icon="tabler:login" className="w-5 h-5" />
+                  Iniciar sesión
+                </li>
+                <li
+                  onClick={() => navigate("/auth?modo=registro")}
+                  className="flex items-center gap-2 p-3 mt-2 bg-orange-500 text-white rounded hover:bg-black cursor-pointer transition-transform hover:scale-105"
+                >
+                  <Icon icon="tabler:user-plus" className="w-5 h-5" />
+                  Registrarse
+                </li>
+              </>
+            )}
           </>
         )}
       </ul>

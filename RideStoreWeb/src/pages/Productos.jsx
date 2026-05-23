@@ -31,7 +31,8 @@ export default function Productos() {
   const location = useLocation();
   const modeloId = new URLSearchParams(location.search).get("modeloId") || "";
   const token = localStorage.getItem("token");
-  const esAdmin = Boolean(token);
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const esAdmin = usuario?.rol?.toLowerCase() === "admin";
   const esCatalogoPorModelo = Boolean(modeloId);
 
   useEffect(() => {
@@ -177,14 +178,30 @@ export default function Productos() {
     reader.onerror = (error) => console.error("Error al leer imagen", error);
   };
 
-  const agregarAlCarrito = (producto) => {
+  const guardarEnCarrito = (producto, cantidad) => {
+    const stockDisponible = Number(producto.stock) || 0;
     const carritoActual = JSON.parse(localStorage.getItem("carrito")) || [];
-    const productoExistente = carritoActual.find((p) => p._id === producto._id);
+    const productoExistente = carritoActual.find((p) => p.productoId === producto._id);
 
     if (productoExistente) {
-      productoExistente.cantidad += 1;
+      const cantidadFinal = Math.min(productoExistente.cantidad + cantidad, stockDisponible);
+
+      if (cantidadFinal === productoExistente.cantidad) {
+        Swal.fire("Stock insuficiente", "No puedes agregar más unidades que el stock disponible", "warning");
+        return;
+      }
+
+      productoExistente.cantidad = cantidadFinal;
+      productoExistente.stock = stockDisponible;
     } else {
-      carritoActual.push({ ...producto, cantidad: 1 });
+      carritoActual.push({
+        productoId: producto._id,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        imagen: producto.imagen,
+        cantidad,
+        stock: stockDisponible,
+      });
     }
 
     localStorage.setItem("carrito", JSON.stringify(carritoActual));
@@ -196,6 +213,60 @@ export default function Productos() {
       timer: 1500,
       showConfirmButton: false,
     });
+  };
+
+  const agregarAlCarrito = async (producto) => {
+    const stockDisponible = Number(producto.stock) || 0;
+
+    if (stockDisponible <= 0) {
+      Swal.fire("Sin stock", "Este producto no tiene unidades disponibles", "warning");
+      return;
+    }
+
+    const resultado = await Swal.fire({
+      title: producto.nombre,
+      html: `<p>Stock disponible: <strong>${stockDisponible}</strong></p>`,
+      input: "number",
+      inputValue: 1,
+      inputAttributes: {
+        min: 1,
+        max: stockDisponible,
+        step: 1,
+      },
+      showCancelButton: true,
+      confirmButtonText: "Agregar al carrito",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#ea580c",
+      preConfirm: (valor) => {
+        if (valor === "" || valor === null || valor === undefined) {
+          Swal.showValidationMessage("Ingresa una cantidad");
+          return false;
+        }
+
+        const cantidad = Number(valor);
+
+        if (cantidad < 1) {
+          Swal.showValidationMessage("La cantidad mínima es 1");
+          return false;
+        }
+
+        if (!Number.isInteger(cantidad)) {
+          Swal.showValidationMessage("La cantidad debe ser un número entero");
+          return false;
+        }
+
+        if (cantidad > stockDisponible) {
+          Swal.showValidationMessage("No puedes agregar más unidades que el stock disponible");
+          return false;
+        }
+
+        return cantidad;
+      },
+    });
+
+    if (resultado.isConfirmed) {
+      guardarEnCarrito(producto, resultado.value);
+    }
   };
 
   const abrirCrearProducto = () => {
@@ -555,12 +626,21 @@ export default function Productos() {
 
                   <div className="flex flex-wrap justify-center items-center gap-2">
                     <button
-                      className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transform hover:scale-105 transition-transform duration-300"
+                      disabled={!esAdmin && (Number(producto.stock) || 0) <= 0}
+                      className={`text-white px-4 py-2 rounded transition-transform duration-300 ${
+                        !esAdmin && (Number(producto.stock) || 0) <= 0
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-orange-500 hover:bg-orange-600 transform hover:scale-105"
+                      }`}
                       onClick={() => {
                         if (!esAdmin) agregarAlCarrito(producto);
                       }}
                     >
-                      {esAdmin ? "Ver detalle" : "Agregar al carrito"}
+                      {esAdmin
+                        ? "Ver detalle"
+                        : (Number(producto.stock) || 0) <= 0
+                          ? "Sin stock"
+                          : "Agregar al carrito"}
                     </button>
 
                     {esAdmin && (

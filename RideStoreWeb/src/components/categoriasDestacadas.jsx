@@ -6,7 +6,8 @@ import Swal from "sweetalert2";
 export default function MarcasDestacadas() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const esAdmin = Boolean(token);
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const esAdmin = usuario?.rol?.toLowerCase() === "admin";
 
   const [brands, setBrands] = useState([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
