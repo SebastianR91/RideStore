@@ -14,7 +14,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const cerrarSesion = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
-    navigate("/");
+    navigate("/auth?modo=login");
     window.location.reload();
   };
 
@@ -62,7 +62,7 @@ export default function Sidebar({ isOpen, onClose }) {
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:user" className="w-5 h-5" />
-              <span className="w-full">Mi perfil</span>
+              <Link to="/perfil" className="w-full">Mi perfil</Link>
             </li>
             <li onClick={cerrarSesion} className={itemClass}>
               <Icon icon="tabler:logout" className="w-5 h-5" />
@@ -81,11 +81,11 @@ export default function Sidebar({ isOpen, onClose }) {
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:volume" className="w-5 h-5" />
-              Marketing
+              <Link to="/marketing" className="w-full">Marketing</Link>
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:currency-dollar" className="w-5 h-5" />
-              <Link to="/pedidos-admin" className="w-full">Ventas/Pedidos</Link>
+              <Link to="/ventas-pedidos" className="w-full">Ventas/Pedidos</Link>
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:motorbike" className="w-5 h-5" />
@@ -93,15 +93,15 @@ export default function Sidebar({ isOpen, onClose }) {
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:wallet" className="w-5 h-5" />
-              Cartera
+              <Link to="/cartera" className="w-full">Cartera</Link>
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:chart-bar" className="w-5 h-5" />
-              Informes
+              <Link to="/informes" className="w-full">Informes</Link>
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:tools" className="w-5 h-5" />
-              Herramientas
+              <Link to="/herramientas" className="w-full">Herramientas</Link>
             </li>
 
             {!usuario && (
