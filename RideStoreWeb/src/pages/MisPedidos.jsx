@@ -47,7 +47,7 @@ export default function MisPedidos() {
       </h1>
 
       {pedidos.length === 0 ? (
-        <p className="text-gray-500 text-center">Todavía no tienes pedidos registrados.</p>
+        <p className="text-gray-500 text-center">Aún no tienes pedidos registrados</p>
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {pedidos.map((pedido) => (

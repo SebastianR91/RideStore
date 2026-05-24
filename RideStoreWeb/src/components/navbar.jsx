@@ -10,6 +10,7 @@ import menuIcon from "../assets/icons/menu_h.svg";
 export default function Navbar({ onToggleSidebar }) {
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const fotoUsuario = usuario?.fotoPerfil || usuarioIcon;
   const [mostrarPanel, setMostrarPanel] = useState(false);
 
   const cerrarSesion = async () => {
@@ -106,10 +107,10 @@ export default function Navbar({ onToggleSidebar }) {
 
         {/* Imagen de usuario */}
         <img
-          src={usuarioIcon}
+          src={fotoUsuario}
           alt="Usuario"
           onClick={() => setMostrarPanel(!mostrarPanel)}
-          className="w-10 h-10 rounded-full hover:scale-125 hover:ring-2 hover:ring-orange-500 transition-transform cursor-pointer"
+          className="w-10 h-10 rounded-full object-cover hover:scale-125 hover:ring-2 hover:ring-orange-500 transition-transform cursor-pointer"
         />
 
         {/* Panel desplegable de usuario */}

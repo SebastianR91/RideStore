@@ -3,7 +3,6 @@ import Swal from "sweetalert2";
 import { formatearPrecio } from "../utils/formatearPrecio";
 
 const estadosPedido = [
-  "PENDIENTE",
   "PAGADO",
   "EN_PREPARACION",
   "ENVIADO",

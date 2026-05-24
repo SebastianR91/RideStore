@@ -17,6 +17,7 @@ import Cartera from "./pages/Cartera";
 import Informes from "./pages/Informes";
 import Herramientas from "./pages/Herramientas";
 import Perfil from "./pages/Perfil";
+import Checkout from "./pages/Checkout";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/marcas" element={<Categorias />} />
           <Route path="/nosotros" element={<Nosotros />} /> 
           <Route path="/carrito" element={<Carrito />} /> 
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/catalogo" element={<Catalogo />} /> 
           <Route path="/productos" element={<Productos />} /> 
           <Route path="/modelos" element={<Modelos />} />
