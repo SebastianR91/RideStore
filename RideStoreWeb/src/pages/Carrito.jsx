@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { formatearPrecio } from "../utils/formatearPrecio";
 
 export default function Carrito() {
   const [carrito, setCarrito] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const carritoGuardado = JSON.parse(localStorage.getItem("carrito")) || [];
@@ -54,10 +56,106 @@ export default function Carrito() {
 
   const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
 
+  const iniciarCheckout = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      Swal.fire("Inicia sesión", "Debes iniciar sesión para finalizar tu compra.", "warning");
+      navigate("/auth?modo=login");
+      return;
+    }
+
+    if (carrito.length === 0) {
+      Swal.fire("Carrito vacío", "Agrega productos antes de comprar.", "info");
+      return;
+    }
+
+    const resumen = carrito
+      .map((item) => `<li>${item.nombre} x ${item.cantidad} - $${formatearPrecio(item.precio * item.cantidad)}</li>`)
+      .join("");
+
+    const { value: datosPago } = await Swal.fire({
+      title: "Pago simulado",
+      html: `
+        <div style="text-align:left">
+          <label>Dirección de envío</label>
+          <input id="direccionEnvio" class="swal2-input" placeholder="Dirección de envío" />
+          <label>Teléfono de contacto</label>
+          <input id="telefonoContacto" class="swal2-input" placeholder="Teléfono de contacto" />
+          <p><strong>Método de pago:</strong> Pago simulado</p>
+          <ul>${resumen}</ul>
+          <p><strong>Total:</strong> $${formatearPrecio(total)}</p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Confirmar pago",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#ea580c",
+      preConfirm: () => {
+        const direccionEnvio = document.getElementById("direccionEnvio").value.trim();
+        const telefonoContacto = document.getElementById("telefonoContacto").value.trim();
+
+        if (!direccionEnvio) {
+          Swal.showValidationMessage("Ingresa una dirección de envío");
+          return false;
+        }
+
+        if (!telefonoContacto) {
+          Swal.showValidationMessage("Ingresa un teléfono de contacto");
+          return false;
+        }
+
+        return { direccionEnvio, telefonoContacto };
+      },
+    });
+
+    if (!datosPago) return;
+
+    try {
+      const res = await fetch("http://localhost:5000/api/ordenes/simular-pago", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: carrito.map((item) => ({
+            productoId: item.productoId || item._id,
+            cantidad: item.cantidad,
+          })),
+          direccionEnvio: datosPago.direccionEnvio,
+          telefonoContacto: datosPago.telefonoContacto,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        Swal.fire("Error", data.mensaje || "No se pudo crear el pedido", "error");
+        return;
+      }
+
+      localStorage.removeItem("carrito");
+      setCarrito([]);
+
+      await Swal.fire({
+        icon: "success",
+        title: "Pago aprobado",
+        text: "Tu pedido fue creado exitosamente",
+        confirmButtonColor: "#ea580c",
+      });
+
+      navigate("/mis-pedidos");
+    } catch (error) {
+      console.error("Error al crear pedido:", error);
+      Swal.fire("Error", "Hubo un problema al procesar el pago simulado", "error");
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 mt-20">
       <h1 className="text-3xl font-bold mb-10 text-center text-orange-600">
-        🛒 Tu Carrito
+        Tu carrito
       </h1>
 
       {carrito.length === 0 ? (
@@ -79,7 +177,6 @@ export default function Carrito() {
                 )}
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg">{item.nombre}</h3>
-                  <p className="text-gray-600">{item.descripcion}</p>
 
                   <div className="flex items-center gap-2 mt-2">
                     <button
@@ -117,11 +214,7 @@ export default function Carrito() {
               Total: ${formatearPrecio(total)}
             </h2>
             <button
-              onClick={() => {
-                Swal.fire("Gracias", "Compra simulada 🚀", "success");
-                localStorage.removeItem("carrito");
-                setCarrito([]);
-              }}
+              onClick={iniciarCheckout}
               className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded transition"
             >
               Comprar

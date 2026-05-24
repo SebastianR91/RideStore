@@ -10,6 +10,8 @@ import Catalogo from "./pages/Catalogo";
 import Productos from "./pages/Productos";
 import Modelos from "./pages/Modelos";
 import CatalogoCategorias from "./pages/CatalogoCategorias";
+import MisPedidos from "./pages/MisPedidos";
+import PedidosAdmin from "./pages/PedidosAdmin";
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
           <Route path="/productos" element={<Productos />} /> 
           <Route path="/modelos" element={<Modelos />} />
           <Route path="/catalogo-categorias" element={<CatalogoCategorias />} />
+          <Route path="/mis-pedidos" element={<MisPedidos />} />
+          <Route path="/pedidos-admin" element={<PedidosAdmin />} />
         </Route>
 
         {/* Página sin layout (login/register) */}

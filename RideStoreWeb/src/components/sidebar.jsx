@@ -58,7 +58,7 @@ export default function Sidebar({ isOpen, onClose }) {
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:clipboard-list" className="w-5 h-5" />
-              <span className="w-full">Mis pedidos</span>
+              <Link to="/mis-pedidos" className="w-full">Mis pedidos</Link>
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:user" className="w-5 h-5" />
@@ -85,7 +85,11 @@ export default function Sidebar({ isOpen, onClose }) {
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:currency-dollar" className="w-5 h-5" />
-              Ventas
+              <Link to="/pedidos-admin" className="w-full">Ventas/Pedidos</Link>
+            </li>
+            <li className={itemClass}>
+              <Icon icon="tabler:motorbike" className="w-5 h-5" />
+              <Link to="/categorias" className="w-full">Marcas/Modelos</Link>
             </li>
             <li className={itemClass}>
               <Icon icon="tabler:wallet" className="w-5 h-5" />
